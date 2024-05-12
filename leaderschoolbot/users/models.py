@@ -7,7 +7,13 @@ class User(models.Model):
         unique=True,
     )
     name = models.TextField(
-        verbose_name='Имя пользователя',
+        verbose_name='Юзернейм',
+        null=True,
+    )
+
+    first_last_name = models.TextField(
+        verbose_name='Имя и фамилия',
+        null=True,
     )
 
     def __str__(self):
@@ -22,7 +28,7 @@ class Message(models.Model):
     user = models.ForeignKey(
         to='users.User',
         verbose_name='Профиль',
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
     )
     text = models.TextField(
         verbose_name='Текст',

@@ -14,7 +14,8 @@ def do_echo(update: Update, contex: CallbackContext):
     p, _ = User.objects.get_or_create(
         external_id=chat_id,
         defaults={
-            'name': update.message.from_user.username,
+            'name': update.message.from_user.name,
+            'first_last_name': update.message.from_user.first_name + ' ' + update.message.from_user.last_name
         }
     )
 

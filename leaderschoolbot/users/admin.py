@@ -5,7 +5,7 @@ from .models import User, Message
 
 @admin.register(User)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'external_id', 'name')
+    list_display = ('id', 'external_id', 'name', 'first_last_name')
     form = UserForm
 
 
