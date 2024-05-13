@@ -22,10 +22,9 @@ class User(models.Model):
     ]
 
     access_level = models.CharField(
-        max_length = 10,
-        choices = CHOICES,
+        max_length=10,
+        choices=CHOICES,
         verbose_name='Уровень доступа',)
-
 
     def __str__(self):
         return f'#{self.external_id} {self.name}'

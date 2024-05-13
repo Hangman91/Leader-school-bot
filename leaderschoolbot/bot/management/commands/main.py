@@ -12,16 +12,18 @@ from telegram.utils.request import Request
 def save_user_and_messages(func):
     """Декоратор, позволяющий сохранять в базу пользователей и их сообщения"""
 
-    def wrapper(update, contex):
+    def wrapper(update, context):
 
         chat_id = update.message.chat_id
         text = update.message.text
-
+        name = update.message.from_user.name
+        first_name = update.message.from_user.first_name
+        last_name = update.message.from_user.last_name
         p, _ = User.objects.get_or_create(
             external_id=chat_id,
             defaults={
-                'name': update.message.from_user.name,
-                'first_last_name': update.message.from_user.first_name + ' ' + update.message.from_user.last_name,
+                'name': name,
+                'first_last_name': first_name + ' ' + last_name,
                 'access_level': 'User',
             }
         )
@@ -30,11 +32,61 @@ def save_user_and_messages(func):
             user=p,
             text=text,
         )
+        m.save()
 
-        m.save()   
-
-        return func(update, contex)
+        return func(update, context)
     return wrapper
+
+
+def check_admin(func):
+    """Декоратор, отсекающий неадминов"""
+
+    def wrapper(update, context):
+        chat = update.effective_chat
+
+        field_name = 'access_level'
+        obj = User.objects.filter(external_id=chat.id)[0]
+        field_value = getattr(obj, field_name)
+        if field_value != 'Admin':
+            context.bot.send_message(
+                chat_id=chat.id,
+                text='У тебя нет прав писать сюда'
+                )
+            return
+        return func(update, context)
+    return wrapper
+
+@check_admin
+def admin(update, context):
+    chat = update.effective_chat
+
+    field_name = 'access_level'
+    obj = User.objects.filter(external_id=chat.id)[0]
+    field_value = getattr(obj, field_name)
+    # if field_value == 'Admin':
+    #     context.bot.send_message(
+    #         chat_id=chat.id,
+    #         text='Добро пожаловать в админское меню'
+    #         )
+    # else:
+    #     context.bot.send_message(
+    #         chat_id=chat.id,
+    #         text='У тебя нет прав писать сюда'
+    #         )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text='Добро пожаловать в админское меню'
+        ) 
+  #  print(field_value)
+    # button = ReplyKeyboardMarkup(
+    #     [['/start']],
+    #     resize_keyboard=True
+    #     )
+    # context.bot.send_message(
+    #     chat_id=chat.id,
+    #     text='Добро пожаловать в админское меню',
+    #     reply_markup=button
+    #     )
 
 
 @save_user_and_messages
@@ -46,6 +98,7 @@ def do_echo(update: Update, contex: CallbackContext):
     update.message.reply_text(
         text=reply_text
     )
+
 
 @save_user_and_messages
 def call_operator(update, context):
@@ -61,6 +114,7 @@ def call_operator(update, context):
         )
 
 
+@save_user_and_messages
 def wake_up(update, context):
     chat = update.effective_chat
     name = update.message.chat.first_name
@@ -84,6 +138,8 @@ dict = {
         call_operator,
     r'здравствуйте|сначала|привет|начало':
         wake_up,
+    r'админ':
+        admin,
     }
 
 

@@ -5,9 +5,19 @@ from .models import User, Message
 
 @admin.register(User)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('first_last_name', 'external_id', 'name', 'access_level', 'count')
-    form = UserForm  
-    fields = ('name', 'first_last_name', 'access_level', )
+    list_display = (
+        'first_last_name',
+        'external_id',
+        'name',
+        'access_level',
+        'count'
+    )
+    form = UserForm
+    fields = (
+        'name',
+        'first_last_name',
+        'access_level'
+    )
 
     def count(self, obj):
         result = Message.objects.filter(user=obj).count()
@@ -18,4 +28,9 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Message)
 class MessageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'user', 'text', 'created_at')
+    list_display = (
+        'id',
+        'user',
+        'text',
+        'created_at'
+    )
