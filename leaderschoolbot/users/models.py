@@ -16,6 +16,17 @@ class User(models.Model):
         null=True,
     )
 
+    CHOICES = [
+        ('Admin', 'Админ'),
+        ('User', 'Пользователь'),
+    ]
+
+    access_level = models.CharField(
+        max_length = 10,
+        choices = CHOICES,
+        verbose_name='Уровень доступа',)
+
+
     def __str__(self):
         return f'#{self.external_id} {self.name}'
 

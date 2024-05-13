@@ -5,8 +5,15 @@ from .models import User, Message
 
 @admin.register(User)
 class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('id', 'external_id', 'name', 'first_last_name')
-    form = UserForm
+    list_display = ('first_last_name', 'external_id', 'name', 'access_level', 'count')
+    form = UserForm  
+    fields = ('name', 'first_last_name', 'access_level', )
+
+    def count(self, obj):
+        result = Message.objects.filter(user=obj).count()
+        return result
+
+    count.short_description = "Количество сообщений"
 
 
 @admin.register(Message)

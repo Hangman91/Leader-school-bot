@@ -21,7 +21,8 @@ def save_user_and_messages(func):
             external_id=chat_id,
             defaults={
                 'name': update.message.from_user.name,
-                'first_last_name': update.message.from_user.first_name + ' ' + update.message.from_user.last_name
+                'first_last_name': update.message.from_user.first_name + ' ' + update.message.from_user.last_name,
+                'access_level': 'User',
             }
         )
 
