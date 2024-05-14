@@ -1,11 +1,12 @@
 import re
+import datetime
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from users.models import User, Message
 
 from telegram import Bot, Update, ReplyKeyboardMarkup
-from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
+from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler
 from telegram.utils.request import Request
 
 
@@ -60,37 +61,86 @@ def check_admin(func):
 def admin(update, context):
     chat = update.effective_chat
 
-    field_name = 'access_level'
-    obj = User.objects.filter(external_id=chat.id)[0]
-    field_value = getattr(obj, field_name)
-    # if field_value == 'Admin':
-    #     context.bot.send_message(
-    #         chat_id=chat.id,
-    #         text='Добро пожаловать в админское меню'
-    #         )
-    # else:
-    #     context.bot.send_message(
-    #         chat_id=chat.id,
-    #         text='У тебя нет прав писать сюда'
-    #         )
+    # field_name = 'access_level'
+    # obj = User.objects.filter(external_id=chat.id)[0]
+    # field_value = getattr(obj, field_name)
+
+    buttons = ReplyKeyboardMarkup(
+        [['/statistic', '/massmail'],],
+        resize_keyboard=True
+        )
     context.bot.send_message(
         chat_id=chat.id,
-        text='Добро пожаловать в админское меню'
-        ) 
-  #  print(field_value)
-    # button = ReplyKeyboardMarkup(
-    #     [['/start']],
-    #     resize_keyboard=True
-    #     )
-    # context.bot.send_message(
-    #     chat_id=chat.id,
-    #     text='Добро пожаловать в админское меню',
-    #     reply_markup=button
-    #     )
+        text='Добро пожаловать в админское меню',
+        reply_markup=buttons
+        )
 
+
+@check_admin
+def statistic(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['/day', '/week', '/all_time'],],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text='За какой период?',
+        reply_markup=buttons
+        )
+
+
+@check_admin
+def statistic_day(update, context):
+    chat = update.effective_chat
+    now = datetime.datetime.now()
+    yesterday = now - datetime.timedelta(days=1)
+    objs = Message.objects.filter(created_at__range=(yesterday,now)).all()
+    count_message = objs.count()
+    users = []
+    for obj in objs:
+        users.append(getattr(obj, 'user_id'))
+    count_users = len(set(users))
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=f'За сутки было {count_message} сообщений от {count_users} пользователей',
+        )
+
+
+@check_admin
+def statistic_week(update, context):
+    chat = update.effective_chat
+    now = datetime.datetime.now()
+    week_ago = now - datetime.timedelta(days=7)
+    objs = Message.objects.filter(created_at__range=(week_ago,now)).all()
+    count_message = objs.count()
+    users = []
+    for obj in objs:
+        users.append(getattr(obj, 'user_id'))
+    count_users = len(set(users))
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=f'За неделю было {count_message} сообщений от {count_users} пользователей',
+        )
+
+
+@check_admin
+def statistic_all_time(update, context):
+    chat = update.effective_chat
+    now = datetime.datetime.now()
+    objs = Message.objects.all()
+    count_message = objs.count()
+    users = []
+    for obj in objs:
+        users.append(getattr(obj, 'user_id'))
+    count_users = len(set(users))
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=f'За всё время было {count_message} сообщений от {count_users} пользователей',
+        )
 
 @save_user_and_messages
-def do_echo(update: Update, contex: CallbackContext):
+def do_echo(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     text = update.message.text
 
@@ -142,6 +192,17 @@ dict = {
         admin,
     }
 
+dict_admin = {
+    r'statistic':
+        statistic,
+    r'day':
+        statistic_day,
+    r'week':
+        statistic_week,
+    r'all_time':
+        statistic_all_time, 
+    }
+
 
 class Command(BaseCommand):
     help = 'Телеграм-бот'
@@ -163,9 +224,17 @@ class Command(BaseCommand):
                 MessageHandler(
                     Filters.regex(
                         re.compile(a, re.IGNORECASE)),
-                    dict[a]
+                        dict[a]
                     )
                 )
+
+
+        for command in dict_admin:
+            updater.dispatcher.add_handler(
+                CommandHandler(command, dict_admin[command])
+                    )
+
+ #       updater.dispatcher.add_handler(CommandHandler("statistic", statistic))
 
         message_handler = MessageHandler(Filters.text, do_echo)
 
