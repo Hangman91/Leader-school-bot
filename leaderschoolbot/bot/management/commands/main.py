@@ -57,14 +57,10 @@ def check_admin(func):
         return func(update, context)
     return wrapper
 
+
 @check_admin
 def admin(update, context):
     chat = update.effective_chat
-
-    # field_name = 'access_level'
-    # obj = User.objects.filter(external_id=chat.id)[0]
-    # field_value = getattr(obj, field_name)
-
     buttons = ReplyKeyboardMarkup(
         [['/statistic', '/massmail'],],
         resize_keyboard=True
@@ -80,7 +76,8 @@ def admin(update, context):
 def statistic(update, context):
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
-        [['/day', '/week', '/all_time'],],
+        [['/day', '/week', '/all_time'],
+         ['/admin']],
         resize_keyboard=True
         )
     context.bot.send_message(
@@ -91,28 +88,23 @@ def statistic(update, context):
 
 
 @check_admin
-def statistic_day(update, context):
+def statistic_time(update, context):
     chat = update.effective_chat
+    text = update.message.text
+    dict_time = {
+        "/day": "день",
+        "/week": "неделю",
+        "/all_time": "всё время",
+    }
     now = datetime.datetime.now()
     yesterday = now - datetime.timedelta(days=1)
-    objs = Message.objects.filter(created_at__range=(yesterday,now)).all()
-    count_message = objs.count()
-    users = []
-    for obj in objs:
-        users.append(getattr(obj, 'user_id'))
-    count_users = len(set(users))
-    context.bot.send_message(
-        chat_id=chat.id,
-        text=f'За сутки было {count_message} сообщений от {count_users} пользователей',
-        )
-
-
-@check_admin
-def statistic_week(update, context):
-    chat = update.effective_chat
-    now = datetime.datetime.now()
     week_ago = now - datetime.timedelta(days=7)
-    objs = Message.objects.filter(created_at__range=(week_ago,now)).all()
+    if text == "/day":
+        objs = Message.objects.filter(created_at__range=(yesterday, now)).all()
+    elif text == "/week":
+        objs = Message.objects.filter(created_at__range=(week_ago, now)).all()
+    else:
+        objs = Message.objects.all()
     count_message = objs.count()
     users = []
     for obj in objs:
@@ -120,24 +112,9 @@ def statistic_week(update, context):
     count_users = len(set(users))
     context.bot.send_message(
         chat_id=chat.id,
-        text=f'За неделю было {count_message} сообщений от {count_users} пользователей',
+        text=f'За {dict_time[text]} было {count_message} сообщений от {count_users} пользователей',
         )
 
-
-@check_admin
-def statistic_all_time(update, context):
-    chat = update.effective_chat
-    now = datetime.datetime.now()
-    objs = Message.objects.all()
-    count_message = objs.count()
-    users = []
-    for obj in objs:
-        users.append(getattr(obj, 'user_id'))
-    count_users = len(set(users))
-    context.bot.send_message(
-        chat_id=chat.id,
-        text=f'За всё время было {count_message} сообщений от {count_users} пользователей',
-        )
 
 @save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
@@ -188,19 +165,19 @@ dict = {
         call_operator,
     r'здравствуйте|сначала|привет|начало':
         wake_up,
-    r'админ':
-        admin,
     }
 
 dict_admin = {
+    r'admin':
+        admin,
     r'statistic':
         statistic,
     r'day':
-        statistic_day,
+        statistic_time,
     r'week':
-        statistic_week,
+        statistic_time,
     r'all_time':
-        statistic_all_time, 
+        statistic_time,
     }
 
 
@@ -224,17 +201,14 @@ class Command(BaseCommand):
                 MessageHandler(
                     Filters.regex(
                         re.compile(a, re.IGNORECASE)),
-                        dict[a]
-                    )
+                    dict[a]
                 )
-
+            )
 
         for command in dict_admin:
             updater.dispatcher.add_handler(
                 CommandHandler(command, dict_admin[command])
                     )
-
- #       updater.dispatcher.add_handler(CommandHandler("statistic", statistic))
 
         message_handler = MessageHandler(Filters.text, do_echo)
 
