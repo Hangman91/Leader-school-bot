@@ -1,4 +1,5 @@
 import re
+import time
 import datetime
 
 from django.core.management.base import BaseCommand
@@ -9,7 +10,8 @@ from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler, ConversationHandler
 from telegram.utils.request import Request
 
-MAIL, CHECK_MAIL = range(2)
+MAIL, CHECK_MAIL, ARE_YOU_SHURE, ARE_YOU_SHURE2 = range(4)
+
 
 def save_user_and_messages(func):
     """Декоратор, позволяющий сохранять в базу пользователей и их сообщения"""
@@ -117,6 +119,7 @@ def statistic_time(update, context):
         )
 
 
+@check_admin
 def massmail(update, context):
     update.message.reply_text(
         'Введите сообщение',
@@ -125,22 +128,106 @@ def massmail(update, context):
     return MAIL
 
 
+@check_admin
 def mail_handler(update, context):
-    mail_data = update.message.text
+    text_mail = update.message.text
     chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Да, я проверил', 'Нет, нашел ошибку']],
+        resize_keyboard=True
+        )
     context.bot.send_message(
         chat_id=chat.id,
-        text=mail_data,
+        text=text_mail,
         )
     update.message.reply_text(
         'Сообщение действительно таково?',
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=buttons
     )
+    context.user_data["MAIL"] = text_mail
     return CHECK_MAIL
 
 
+@check_admin
 def check_mail_handler(update, context):
-    pass
+    if update.message.text == 'Да, я проверил':
+        buttons = ReplyKeyboardMarkup(
+            [['Да', 'Нет']],
+            resize_keyboard=True
+            )
+        update.message.reply_text(
+            'Ты уверен в массовом спаме?',
+            reply_markup=buttons
+        )
+        return ARE_YOU_SHURE
+    else:
+        update.message.reply_text(
+            'Давай заново',
+            reply_markup=ReplyKeyboardRemove()
+        )
+        return ConversationHandler.END
+
+
+@check_admin
+def are_you_shure_handler(update, context):
+    if update.message.text == 'Да':
+        buttons = ReplyKeyboardMarkup(
+            [['/cancel']],
+            resize_keyboard=True
+            )
+        update.message.reply_text(
+            'Ты уверен в массовом спаме? Если да, то введи первое слово сообщения',
+            reply_markup=buttons
+        )
+        return ARE_YOU_SHURE2
+    else:
+        update.message.reply_text(
+            'Ок',
+            reply_markup=ReplyKeyboardRemove()
+        )
+        return ConversationHandler.END
+
+
+@check_admin
+def are_you_shure2_handler(update, context):
+    text_mail = context.user_data["MAIL"]
+    first_word = text_mail.split()[0]
+    chat = update.effective_chat
+    if update.message.text == first_word:
+        update.message.reply_text(
+            'Отправка пошла',
+            reply_markup=ReplyKeyboardRemove()
+        )
+        list_of_massmail = User.objects.all()
+        successfully_count = 0
+        banned_count = 0
+        for victim in list_of_massmail:
+            victim_id = getattr(victim, 'external_id')
+            try:
+                context.bot.send_message(
+                    chat_id=victim_id,
+                    text=text_mail
+                    )
+                successfully_count += 1
+                time.sleep(1)
+            except BaseException:
+                banned_count += 1
+        context.bot.send_message(
+            chat_id=chat.id,
+            text=f'Успешно отправлено {successfully_count} сообщений, заблокировано {banned_count}',
+            )
+        return ConversationHandler.END
+    else:
+        update.message.reply_text(
+            'Неверно, попробуй ещё раз',
+            reply_markup=ReplyKeyboardRemove()
+        )
+
+
+@check_admin
+def cancel(update, context):
+    return ConversationHandler.END
+
 
 @save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
@@ -236,23 +323,26 @@ class Command(BaseCommand):
                 CommandHandler(command, dict_admin[command])
                     )
 
-
         conv_handler = ConversationHandler(
             entry_points=[
                 CommandHandler('massmail', massmail),
             ],
             states={
                 MAIL: [
-                    MessageHandler(Filters.all, mail_handler, pass_user_data=True),
+                    MessageHandler(Filters.all, mail_handler),
                 ],
                 CHECK_MAIL: [
-                    MessageHandler(Filters.all, check_mail_handler, pass_user_data=True),
+                    MessageHandler(Filters.all, check_mail_handler),
                 ],
-                # ARE_YOU_SHURE:
-                # ARE_YOU_SHURE2:
+                ARE_YOU_SHURE: [
+                    MessageHandler(Filters.all, are_you_shure_handler),
+                ],
+                ARE_YOU_SHURE2: [
+                    MessageHandler(Filters.all, are_you_shure2_handler),
+                ],
             },
             fallbacks=[
-                CommandHandler('cancel', admin),
+                CommandHandler('massmail', massmail),
             ]
         )
         updater.dispatcher.add_handler(conv_handler)
