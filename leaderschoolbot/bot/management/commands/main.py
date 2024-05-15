@@ -5,10 +5,11 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from users.models import User, Message
 
-from telegram import Bot, Update, ReplyKeyboardMarkup
-from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler
+from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler, ConversationHandler
 from telegram.utils.request import Request
 
+MAIL, CHECK_MAIL = range(2)
 
 def save_user_and_messages(func):
     """Декоратор, позволяющий сохранять в базу пользователей и их сообщения"""
@@ -116,6 +117,31 @@ def statistic_time(update, context):
         )
 
 
+def massmail(update, context):
+    update.message.reply_text(
+        'Введите сообщение',
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return MAIL
+
+
+def mail_handler(update, context):
+    mail_data = update.message.text
+    chat = update.effective_chat
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=mail_data,
+        )
+    update.message.reply_text(
+        'Сообщение действительно таково?',
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return CHECK_MAIL
+
+
+def check_mail_handler(update, context):
+    pass
+
 @save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
@@ -210,6 +236,26 @@ class Command(BaseCommand):
                 CommandHandler(command, dict_admin[command])
                     )
 
+
+        conv_handler = ConversationHandler(
+            entry_points=[
+                CommandHandler('massmail', massmail),
+            ],
+            states={
+                MAIL: [
+                    MessageHandler(Filters.all, mail_handler, pass_user_data=True),
+                ],
+                CHECK_MAIL: [
+                    MessageHandler(Filters.all, check_mail_handler, pass_user_data=True),
+                ],
+                # ARE_YOU_SHURE:
+                # ARE_YOU_SHURE2:
+            },
+            fallbacks=[
+                CommandHandler('cancel', admin),
+            ]
+        )
+        updater.dispatcher.add_handler(conv_handler)
         message_handler = MessageHandler(Filters.text, do_echo)
 
         updater.dispatcher.add_handler(message_handler)
