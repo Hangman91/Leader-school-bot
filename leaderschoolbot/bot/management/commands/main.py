@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from django.conf import settings
 from users.models import User, Message
 
-from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
+from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler, ConversationHandler
 from telegram.utils.request import Request
 
@@ -27,7 +27,7 @@ def save_user_and_messages(func):
             external_id=chat_id,
             defaults={
                 'name': name,
-                'first_last_name': first_name + ' ' + last_name,
+                'first_last_name': str(first_name) + ' ' + str(last_name),
                 'access_level': 'User',
             }
         )
@@ -130,7 +130,7 @@ def massmail(update, context):
 
 @check_admin
 def mail_handler(update, context):
-    text_mail = update.message.text
+    text_mail = update.message.text_markdown
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
         [['Да, я проверил', 'Нет, нашел ошибку']],
@@ -139,6 +139,7 @@ def mail_handler(update, context):
     context.bot.send_message(
         chat_id=chat.id,
         text=text_mail,
+        parse_mode="MARKDOWN"
         )
     update.message.reply_text(
         'Сообщение действительно таково?',
@@ -204,14 +205,16 @@ def are_you_shure2_handler(update, context):
         for victim in list_of_massmail:
             victim_id = getattr(victim, 'external_id')
             try:
-                context.bot.send_message(
+                context.bot.send_photo(
                     chat_id=victim_id,
-                    text=text_mail
+                    photo='https://forpost-sz.ru/sites/default/files/styles/wide169/public/doc/2024/05/16/valeriya-kayryak_kvs_3705.jpg?h=d1cb525d&itok=k9_8zJX2',
+                    caption=text_mail,
+                    parse_mode="MARKDOWN"
                     )
                 successfully_count += 1
                 time.sleep(1)
-            except BaseException:
-                banned_count += 1
+            except Exception as e: print(e)
+#                banned_count += 1
         context.bot.send_message(
             chat_id=chat.id,
             text=f'Успешно отправлено {successfully_count} сообщений, заблокировано {banned_count}',
@@ -232,11 +235,12 @@ def cancel(update, context):
 @save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    text = update.message.text
+    text = update.message.text_markdown
 
     reply_text = "Ваш ID = {}\n\n{}".format(chat_id, text)
     update.message.reply_text(
-        text=reply_text
+        text=reply_text,
+        parse_mode="MARKDOWN"
     )
 
 
