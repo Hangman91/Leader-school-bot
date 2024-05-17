@@ -10,7 +10,7 @@ from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, Pars
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler, ConversationHandler
 from telegram.utils.request import Request
 
-MAIL, CHECK_MAIL, ARE_YOU_SHURE, ARE_YOU_SHURE2 = range(4)
+PHOTO, MAIL, CHECK_MAIL, ARE_YOU_SHURE, ARE_YOU_SHURE2 = range(5)
 
 
 def save_user_and_messages(func):
@@ -121,9 +121,13 @@ def statistic_time(update, context):
 
 @check_admin
 def massmail(update, context):
+    buttons = ReplyKeyboardMarkup(
+        [['/admin'],],
+        resize_keyboard=True
+        )
     update.message.reply_text(
         'Введите сообщение',
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=buttons
     )
     return MAIL
 
@@ -132,21 +136,40 @@ def massmail(update, context):
 def mail_handler(update, context):
     text_mail = update.message.text_markdown
     chat = update.effective_chat
+    context.user_data["MAIL"] = text_mail
+    update.message.reply_text(
+        'Прикрепите картинку',
+    )
+    return PHOTO
+
+@check_admin
+def photo_handler(update, context):
+    chat = update.effective_chat
+    text_mail = context.user_data["MAIL"]
+    file_id = update.message.photo[-1].file_id
+    newFile = context.bot.get_file(file_id)
+
+    context.bot.send_photo(
+        chat_id=chat.id,
+        photo=newFile['file_id'],
+        caption=text_mail,
+        parse_mode="MARKDOWN"
+        )
+
     buttons = ReplyKeyboardMarkup(
         [['Да, я проверил', 'Нет, нашел ошибку']],
         resize_keyboard=True
-        )
-    context.bot.send_message(
-        chat_id=chat.id,
-        text=text_mail,
-        parse_mode="MARKDOWN"
         )
     update.message.reply_text(
         'Сообщение действительно таково?',
         reply_markup=buttons
     )
-    context.user_data["MAIL"] = text_mail
+    context.user_data["PHOTO"] = newFile['file_id']
     return CHECK_MAIL
+
+# def skip_photo(update, context):
+   
+#     return CHECK_MAIL
 
 
 @check_admin
@@ -192,6 +215,7 @@ def are_you_shure_handler(update, context):
 @check_admin
 def are_you_shure2_handler(update, context):
     text_mail = context.user_data["MAIL"]
+    photo = context.user_data["PHOTO"]
     first_word = text_mail.split()[0]
     chat = update.effective_chat
     if update.message.text == first_word:
@@ -207,14 +231,14 @@ def are_you_shure2_handler(update, context):
             try:
                 context.bot.send_photo(
                     chat_id=victim_id,
-                    photo='https://forpost-sz.ru/sites/default/files/styles/wide169/public/doc/2024/05/16/valeriya-kayryak_kvs_3705.jpg?h=d1cb525d&itok=k9_8zJX2',
+                    photo=photo,
                     caption=text_mail,
                     parse_mode="MARKDOWN"
                     )
                 successfully_count += 1
                 time.sleep(1)
-            except Exception as e: print(e)
-#                banned_count += 1
+            except BaseException:
+                banned_count += 1
         context.bot.send_message(
             chat_id=chat.id,
             text=f'Успешно отправлено {successfully_count} сообщений, заблокировано {banned_count}',
@@ -333,7 +357,11 @@ class Command(BaseCommand):
             ],
             states={
                 MAIL: [
-                    MessageHandler(Filters.all, mail_handler),
+                    MessageHandler(Filters.text, mail_handler),
+                ],
+                PHOTO: [
+                    MessageHandler(Filters.photo, photo_handler),
+#                   CommandHandler('skip', skip_photo),
                 ],
                 CHECK_MAIL: [
                     MessageHandler(Filters.all, check_mail_handler),
@@ -346,7 +374,7 @@ class Command(BaseCommand):
                 ],
             },
             fallbacks=[
-                CommandHandler('massmail', massmail),
+                CommandHandler('admin', admin),
             ]
         )
         updater.dispatcher.add_handler(conv_handler)
