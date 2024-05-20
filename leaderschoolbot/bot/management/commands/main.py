@@ -122,25 +122,31 @@ def statistic_time(update, context):
 @check_admin
 def massmail(update, context):
     buttons = ReplyKeyboardMarkup(
-        [['/admin'],],
+        [['/cancel'],],
         resize_keyboard=True
         )
     update.message.reply_text(
         'Введите сообщение',
         reply_markup=buttons
     )
+    context.user_data["SKIP"] = False
     return MAIL
 
 
 @check_admin
 def mail_handler(update, context):
     text_mail = update.message.text_markdown
-    chat = update.effective_chat
     context.user_data["MAIL"] = text_mail
+    buttons = ReplyKeyboardMarkup(
+        [['/skip'], ['/cancel']],
+        resize_keyboard=True
+        )
     update.message.reply_text(
         'Прикрепите картинку',
+        reply_markup=buttons
     )
     return PHOTO
+
 
 @check_admin
 def photo_handler(update, context):
@@ -148,35 +154,52 @@ def photo_handler(update, context):
     text_mail = context.user_data["MAIL"]
     file_id = update.message.photo[-1].file_id
     newFile = context.bot.get_file(file_id)
-
+    context.user_data["PHOTO"] = newFile['file_id']
     context.bot.send_photo(
-        chat_id=chat.id,
-        photo=newFile['file_id'],
-        caption=text_mail,
-        parse_mode="MARKDOWN"
-        )
-
+            chat_id=chat.id,
+            photo=context.user_data["PHOTO"],
+            caption=text_mail,
+            parse_mode="MARKDOWN"
+            )
     buttons = ReplyKeyboardMarkup(
-        [['Да, я проверил', 'Нет, нашел ошибку']],
+        [['Да, я проверил', 'Нет, нашел ошибку'],
+         ['/cancel']],
         resize_keyboard=True
         )
     update.message.reply_text(
         'Сообщение действительно таково?',
         reply_markup=buttons
     )
-    context.user_data["PHOTO"] = newFile['file_id']
     return CHECK_MAIL
 
-# def skip_photo(update, context):
-   
-#     return CHECK_MAIL
+
+@check_admin
+def skip_photo(update, context):
+    chat = update.effective_chat
+    text_mail = context.user_data["MAIL"]
+    context.bot.send_message(
+            chat_id=chat.id,
+            text=text_mail,
+            parse_mode="MARKDOWN"
+            )
+    buttons = ReplyKeyboardMarkup(
+        [['Да, я проверил', 'Нет, нашел ошибку'],
+         ['/cancel']],
+        resize_keyboard=True
+        )
+    update.message.reply_text(
+        'Сообщение действительно таково?',
+        reply_markup=buttons
+    )
+    context.user_data["SKIP"] = True
+    return CHECK_MAIL
 
 
 @check_admin
 def check_mail_handler(update, context):
     if update.message.text == 'Да, я проверил':
         buttons = ReplyKeyboardMarkup(
-            [['Да', 'Нет']],
+            [['Да', 'Нет'],],
             resize_keyboard=True
             )
         update.message.reply_text(
@@ -215,7 +238,7 @@ def are_you_shure_handler(update, context):
 @check_admin
 def are_you_shure2_handler(update, context):
     text_mail = context.user_data["MAIL"]
-    photo = context.user_data["PHOTO"]
+
     first_word = text_mail.split()[0]
     chat = update.effective_chat
     if update.message.text == first_word:
@@ -226,22 +249,31 @@ def are_you_shure2_handler(update, context):
         list_of_massmail = User.objects.all()
         successfully_count = 0
         banned_count = 0
+
         for victim in list_of_massmail:
             victim_id = getattr(victim, 'external_id')
             try:
-                context.bot.send_photo(
-                    chat_id=victim_id,
-                    photo=photo,
-                    caption=text_mail,
-                    parse_mode="MARKDOWN"
-                    )
+                if not context.user_data["SKIP"]:
+                    photo = context.user_data["PHOTO"]
+                    context.bot.send_photo(
+                        chat_id=victim_id,
+                        photo=photo,
+                        caption=text_mail,
+                        parse_mode="MARKDOWN"
+                        )
+                else:
+                    context.bot.send_message(
+                        chat_id=victim_id,
+                        text=text_mail,
+                        parse_mode="MARKDOWN"
+                        )
                 successfully_count += 1
                 time.sleep(1)
             except BaseException:
                 banned_count += 1
         context.bot.send_message(
             chat_id=chat.id,
-            text=f'Успешно отправлено {successfully_count} сообщений, заблокировано {banned_count}',
+            text=f'Успешно отправлено {successfully_count} сообщений, ошибок {banned_count}',
             )
         return ConversationHandler.END
     else:
@@ -253,6 +285,16 @@ def are_you_shure2_handler(update, context):
 
 @check_admin
 def cancel(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['/statistic', '/massmail'],],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+            chat_id=chat.id,
+            text='Отмена массмейла',
+            reply_markup=buttons
+            )
     return ConversationHandler.END
 
 
@@ -357,24 +399,28 @@ class Command(BaseCommand):
             ],
             states={
                 MAIL: [
+                    CommandHandler('cancel', cancel),
                     MessageHandler(Filters.text, mail_handler),
                 ],
                 PHOTO: [
+                    CommandHandler('skip', skip_photo),
                     MessageHandler(Filters.photo, photo_handler),
-#                   CommandHandler('skip', skip_photo),
                 ],
                 CHECK_MAIL: [
+                    CommandHandler('cancel', cancel),
                     MessageHandler(Filters.all, check_mail_handler),
                 ],
                 ARE_YOU_SHURE: [
                     MessageHandler(Filters.all, are_you_shure_handler),
                 ],
                 ARE_YOU_SHURE2: [
+                    CommandHandler('cancel', cancel),
                     MessageHandler(Filters.all, are_you_shure2_handler),
                 ],
             },
             fallbacks=[
-                CommandHandler('admin', admin),
+                MessageHandler(Filters.all, cancel),
+                CommandHandler('cancel', cancel),
             ]
         )
         updater.dispatcher.add_handler(conv_handler)
