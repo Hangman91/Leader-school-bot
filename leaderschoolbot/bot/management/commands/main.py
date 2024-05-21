@@ -4,13 +4,14 @@ import datetime
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from users.models import User, Message
+from users.models import User, Message, Call
 
 from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler, ConversationHandler
 from telegram.utils.request import Request
 
 PHOTO, MAIL, CHECK_MAIL, ARE_YOU_SHURE, ARE_YOU_SHURE2 = range(5)
+SAVE_REQUEST, CANCEL = range(2)
 
 
 def save_user_and_messages(func):
@@ -298,6 +299,11 @@ def cancel(update, context):
     return ConversationHandler.END
 
 
+def cancel1(update, context):
+    print(2)
+    return ConversationHandler.END
+
+
 @save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
@@ -314,14 +320,49 @@ def do_echo(update: Update, context: CallbackContext):
 def call_operator(update, context):
     chat = update.effective_chat
     button = ReplyKeyboardMarkup(
-        [['/start']],
+        [['/start'],
+         ['Запросить звонок']],
         resize_keyboard=True
         )
     context.bot.send_message(
         chat_id=chat.id,
-        text='https://t.me/Mining_university_official',
+        text='Можете написать нашему оператору. https://t.me/Mining_university_official . Также можете запросить звонок оператора, мы свяжемся с Вами в ближайшее время',
         reply_markup=button
         )
+
+
+
+@save_user_and_messages
+def call_request(update, context):
+    update.message.reply_text(
+        'Пришлите одним сообщение номер телефона и как к Вам можно обращаться',
+    )
+    return SAVE_REQUEST
+
+@save_user_and_messages
+def save_call_request(update, context):
+    chat_id = update.message.chat_id
+    user = User.objects.get(external_id=chat_id)
+    message = update.message.text
+    call = Call(
+       user=user,
+       message=message,
+    )
+    call.save()
+
+    list_operator_massmail = User.objects.filter(access_level__in=['Admin', 'Operator'])
+    for operator_mail in list_operator_massmail:
+        operator_massmail_id = getattr(operator_mail, 'external_id')
+        text_mail = 'Новый запрос звонка! ' + message
+        context.bot.send_message(
+                        chat_id=operator_massmail_id,
+                        text=text_mail,
+                        parse_mode="MARKDOWN"
+                        )
+    update.message.reply_text(
+        'Мы свяжемся с Вами в ближайшее время',
+    )
+    return ConversationHandler.END
 
 
 @save_user_and_messages
@@ -346,6 +387,8 @@ def wake_up(update, context):
 dict = {
     r'оператор':
         call_operator,
+    # r'запросить звонок':
+    #     call_request,
     r'здравствуйте|сначала|привет|начало':
         wake_up,
     }
@@ -374,7 +417,6 @@ class Command(BaseCommand):
             token=settings.TOKEN,
         )
         print(bot.get_me())
-
         updater = Updater(
             bot=bot,
             use_context=True)
@@ -423,7 +465,28 @@ class Command(BaseCommand):
                 CommandHandler('cancel', cancel),
             ]
         )
+
+        conv_handler_call = ConversationHandler(
+            entry_points=[
+                MessageHandler(
+                    Filters.regex(re.compile(r'Запросить звонок', re.IGNORECASE)), call_request
+                ),
+            ],
+            states={
+                SAVE_REQUEST: [
+                    MessageHandler(Filters.text, save_call_request),
+                    CommandHandler('cancel', cancel1),
+                ],
+            },
+            fallbacks=[
+                MessageHandler(Filters.all, cancel1),
+                CommandHandler('cancel', cancel1),
+            ]
+        )
+        
         updater.dispatcher.add_handler(conv_handler)
+        updater.dispatcher.add_handler(conv_handler_call)
+
         message_handler = MessageHandler(Filters.text, do_echo)
 
         updater.dispatcher.add_handler(message_handler)

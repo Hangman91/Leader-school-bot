@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .forms import UserForm
-from .models import User, Message
+from .models import User, Message, Call
 
 
 @admin.register(User)
@@ -32,5 +32,15 @@ class MessageAdmin(admin.ModelAdmin):
         'id',
         'user',
         'text',
+        'created_at'
+    )
+
+
+@admin.register(Call)
+class CallAdmin(admin.ModelAdmin):
+    list_display = (
+        'id',
+        'user',
+        'message',
         'created_at'
     )

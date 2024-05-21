@@ -19,6 +19,7 @@ class User(models.Model):
     CHOICES = [
         ('Admin', 'Админ'),
         ('User', 'Пользователь'),
+        ('Operator', 'Оператор'),
     ]
 
     access_level = models.CharField(
@@ -52,3 +53,23 @@ class Message(models.Model):
     class Meta:
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщение'
+
+
+class Call(models.Model):
+    user = models.ForeignKey(
+        to='users.User',
+        verbose_name='Профиль',
+        on_delete=models.CASCADE,
+    )
+    message = models.TextField(
+        verbose_name='Текст сообщения',
+    )
+
+    created_at = models.DateTimeField(
+        verbose_name='Время получения',
+        auto_now_add=True,
+    )
+
+    class Meta:
+        verbose_name = 'Запрос звонка'
+        verbose_name_plural = 'Запрос звонка'
