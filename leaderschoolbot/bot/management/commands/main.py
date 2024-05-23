@@ -305,6 +305,339 @@ def cancel1(update, context):
 
 
 @save_user_and_messages
+def leader_of_the_school(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['О конкурсе', 'Условия участия'],
+         ['Пороговые баллы', 'Подать заявку'],
+         ['Ссылка на ТГ-канал', 'Видеоотзывы студентов'],
+         ['В начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=("Выберете интересующее Вас меню⁠"),
+        reply_markup=buttons
+        )
+
+
+@save_user_and_messages
+def about_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Цели и задачи конкурса', 'Бонусы "Гранта"'],
+         ['Количество мест по гранту', 'Подать заявку'],
+         ['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_photo(
+        chat_id=chat.id,
+        photo='https://leaderschool.spmi.ru/sites/default/files/2024-03/IMG_1522-1-0.jpg',
+        caption=(
+            '«Лидер школы России» – это программа, нацеленная на совершенствование ' +
+            'системы среднего образования и призванная мотивировать талантливых ' +
+            'старшеклассников выбирать при поступлении технические вузы. Ведь наша ' +
+            'страна сегодня остро нуждается в молодых компетентных инженерах, способных ' +
+            'обеспечить в перспективе безболезненную смену поколений на производстве. Кроме ' +
+            'того, данный проект представляет собой один из механизмов интеграции средней и ' +
+            'высшей школы, надёжный мост, связующий наше настоящее и будущее, а также повышающий ' +
+            'устойчивость социально-экономического развития каждого из нас и всего общества в целом. \n' +
+            '*Ректор Санкт-Петербургского горного университета императрицы Екатерины II В.С. Литвиненко*'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def mission_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Конкурс «Лидер школы» проводится с целью организации качественного ' +
+            'приёма на обучение по специальностям Санкт-Петербургского горного университета ' +
+            'в 2024 году. \n' +
+            'Задачи конкурса направлены на: \n' +
+            '\*минимизацию рисков ошибочного выбора и поступления на образовательную программу, ' +
+            'не соответствующую потребностям и ожиданиям поступающего; \n' +
+            '\*предоставление приоритетного гарантированного зачисления для поступающих; \n' +
+            '\*создание необходимых условий стимулирования и поддержки талантливой молодежи; \n' +
+            '\*предоставление особых конкурентных преимуществ для обучения в Университете для  ' +
+            'выпускников образовательных организаций из регионов Российской Федерации. \n' +
+            '[Сайт конкурса](https://leaderschool.spmi.ru/) \n' +
+            '[Видеоролик о конкурсе](https://www.youtube.com/watch?v=kqjqvnK2ZDA) \n'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+@save_user_and_messages
+def places_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Автоматизация технологических процессов и производств – 65\n' +
+            'Архитектура – 25\n' +
+            'Горное дело – 295\n' +
+            'Землеустройство и кадастры – 35\n' +
+            'Информатика и вычислительная техника – 35\n' +
+            'Информационные системы и технологии – 35\n' +
+            'Материаловедение и технологии материалов – 25\n' +
+            'Машиностроение – 20\n' +
+            'Менеджмент – 35\n' +
+            'Металлургия - 25\n' +
+            'Наземные транспортно-технологические средства – 25\n' +
+            'Нефтегазовые техника и технологии – 290\n' +
+            'Приборостроение – 20\n' +
+            'Прикладная геодезия – 40\n' +
+            'Прикладная геология – 100\n' +
+            'Радиоэлектронные системы и комплексы – 25\n' +
+            'Системный анализ и управление – 25 \n' +
+            'Стандартизация и метрология – 25\n' +
+            'Строительство – 25\n' +
+            'Строительство уникальных зданий и сооружений – 50\n' +
+            'Теплоэнергетика и теплотехника – 25\n' +
+            'Технологические машины и оборудование – 40\n' +
+            'Технология геологической разведки – 40\n' +
+            'Технология транспортных процессов – 15\n' +
+            'Технология художественной обработки материалов – 25\n' +
+            'Техносферная безопасность – 20\n' +
+            'Управление в технических системах - 25\n' +
+            'Химическая технология – 60\n' +
+            'Экология и природопользование – 35\n' +
+            'Экономика – 35\n' +
+            'Эксплуатация транспортно-технологических машин и комплексов – 15\n' +
+            'Электроника и наноэлектроника – 25\n' +
+            'Электроэнергетика и электротехника – 60'
+        ),
+        reply_markup=buttons
+        )
+
+
+@save_user_and_messages
+def bonuses_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            '*Победители конкурса «Лидер школы»* получают право быть зачисленными  ' +
+            'на обучение на места за счёт средств «Образовательного гранта» с ' +
+            'предоставлением социального пакета: \n' +
+            '- предоставление койко-места в общежитии; \n' +
+            '- обеспечение форменной одеждой; \n' +
+            '- компенсация проезда к месту проживания для иногородних обучающихся   ' +
+            'один раз в первом семестре после первой сессии *(до 20 000 рублей)*; \n' +
+            '- академическая стипендия в установленном порядке; \n' +
+            '- повышенная стипендия (после первого семестра) при сдаче ' +
+            'первой сессии на «отлично» – *10 000 рублей*; \n' +
+            '- повышенная стипендия (после первого семестра) при сдаче ' +
+            'первой сессии на «хорошо» и «отлично» – *5 000 рублей*; \n' +
+            '- для победителей и призеров предметных олимпиад на ' +
+            'период 5 месяцев – *10 000 рублей*; \n' +
+            '- ежедневное бесплатное разовое питание по рабочим дням «Перекус горняка».'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def form_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'После подачи заявки на участие в конкурсе в течение суток ' +
+            'Вам придёт письмо с дальнейшей инструкцией \n' +
+            '[Подать заявку](https://docs.google.com/forms/d/e'+
+            '/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0aZxj7QqCnbUGg/viewform)' 
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def score_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['От 210 до 219', 'От 220 до 239'],
+         ['От 240 до 259', 'От 260'],
+         ['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Какая у Вас сумма баллов (включая ИД)?'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def answer_score_leader(update, context):
+    chat = update.effective_chat
+    text210_219 = (
+        'Наземные транспортно-технологические средства – 210  \n' +
+        'Стандартизация и метрология – 215 \n' +
+        'Техносферная безопасность – 215 \n' +
+        'Эксплуатация транспортно-технологических машин и комплексов – 215 \n' +
+        'Технологические машины и оборудование – 215 \n' +
+        'Приборостроение – 215 \n' +
+        'Радиоэлектронные системы и комплексы – 215 \n' +
+        'Горное дело – 215 \n'
+    )
+    text220_239 = (
+        'Теплоэнергетика и теплотехника – 220\n' +
+        'Металлургия - 220\n' +
+        'Технология транспортных процессов – 225\n' +
+        'Технология геологической разведки – 225\n' +
+        'Прикладная геология – 225\n' +
+        'Электроэнергетика и электротехника – 230\n' +
+        'Прикладная геодезия – 230\n' +
+        'Машиностроение – 235\n' +
+        'Автоматизация технологических процессов и производств – 235\n'
+    )
+    text239_259 = (
+        'Электроника и наноэлектроника – 240\n' +
+        'Материаловедение и технологии материалов – 240\n' +
+        'Землеустройство и кадастры – 240\n' +
+        'Управление в технических системах - 240\n' +
+        'Экология и природопользование – 245\n' +
+        'Нефтегазовые техника и технологии – 250\n' +
+        'Системный анализ и управление – 250 \n'
+    )
+    text260 = (
+        'Информационные системы и технологии – 260\n' +
+        'Строительство уникальных зданий и сооружений – 260\n' +
+        'Строительство – 260\n' +
+        'Информатика и вычислительная техника – 265\n' +
+        'Менеджмент – 265\n' +
+        'Химическая технология – 270\n' +
+        'Экономика – 275\n' +
+        'Технология художественной обработки материалов – 290\n' +
+        'Архитектура – 320 \n'
+    )
+    if update.message.text == 'От 210 до 219':
+        text = (text210_219)
+    elif update.message.text == 'От 220 до 239':
+        text = (text210_219 + text220_239)
+    elif update.message.text == 'От 240 до 259':
+        text = text210_219 + text220_239 + text239_259
+    elif update.message.text == 'От 260':
+        text = text210_219 + text220_239 + text239_259 + text260
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=text,
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def tg_channel_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Все актуальные новости Вы сможете получить в Телеграм-канале конкурса: \n' +
+            '[Подписаться здесь](https://t.me/mining_leader'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def video_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Отзывы студентов о конкурсе на нашем ютуб-канале: \n' +
+            '[Посмотреть здесь](https://www.youtube.com/@user-yp5ch9mh8n/videos)'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def requirement_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Основновные условия', 'Важные даты конкурса'],
+         ['Пороговые баллы', 'Подать заявку'],
+         ['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Выберите пункт меню.'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def dates_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            '*Заключение соглашений о намерениях:* \n' +
+            'с 15 декабря 2023 по 4 июля 2024 года  \n\n' +
+            '*Подача заявления:*\n' +
+            'с 20 июня 2024 года по 4 июля 2024 года \n\n' +
+            '*Подача оригинала:*\n' +
+            'не позднее 10 июля 2024 года \n\n' +
+            '*Выдача «Гранта»:*\n' +
+            'после 11 июля 2024 года \n\n'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     text = update.message.text_markdown
@@ -338,6 +671,7 @@ def call_request(update, context):
         'Пришлите одним сообщение номер телефона и как к Вам можно обращаться',
     )
     return SAVE_REQUEST
+
 
 @save_user_and_messages
 def save_call_request(update, context):
@@ -391,6 +725,30 @@ dict = {
     #     call_request,
     r'здравствуйте|сначала|привет|начало':
         wake_up,
+    r'Лидер* школы|Вернуться назад к Лидеру школы':
+        leader_of_the_school,
+    r'О конкурсе':
+        about_leader,
+    r'Цели и задачи конкурса':
+        mission_leader,
+    r'Количество мест по гранту':
+        places_leader,
+    r'Бонусы "Гранта"':
+        bonuses_leader,
+    r'Подать заявку':
+        form_leader,
+    r'Пороговые баллы':
+       score_leader,
+    r'От 210 до 219|От 220 до 239|От 240 до 259|От 260':
+        answer_score_leader,
+    r'Ссылка на ТГ-канал':
+        tg_channel_leader,
+    r'Видеоотзывы студентов':
+        video_leader,
+    r'Условия участия':
+        requirement_leader,
+    r'Важные даты конкурса':
+        dates_leader,
     }
 
 dict_admin = {
