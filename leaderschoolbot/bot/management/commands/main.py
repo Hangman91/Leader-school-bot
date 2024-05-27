@@ -468,7 +468,7 @@ def form_leader(update, context):
             'После подачи заявки на участие в конкурсе в течение суток ' +
             'Вам придёт письмо с дальнейшей инструкцией \n' +
             '[Подать заявку](https://docs.google.com/forms/d/e'+
-            '/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0aZxj7QqCnbUGg/viewform)' 
+            '/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0aZxj7QqCnbUGg/viewform)'
         ),
         reply_markup=buttons,
         parse_mode="MARKDOWN"
@@ -841,7 +841,7 @@ class Command(BaseCommand):
                 CommandHandler('cancel', cancel1),
             ]
         )
-        
+
         updater.dispatcher.add_handler(conv_handler)
         updater.dispatcher.add_handler(conv_handler_call)
 
