@@ -2,13 +2,27 @@ import re
 import time
 import datetime
 
+from telegram import (
+    Bot,
+    ReplyKeyboardMarkup,
+    ReplyKeyboardRemove
+)
+
+from telegram.ext import (
+    Filters,
+    MessageHandler,
+    Updater,
+    CommandHandler,
+    ConversationHandler
+)
+
+from telegram.utils.request import Request
+
 from django.core.management.base import BaseCommand
 from django.conf import settings
+
 from users.models import User, Message, Call
 
-from telegram import Bot, Update, ReplyKeyboardMarkup, ReplyKeyboardRemove, ParseMode
-from telegram.ext import CallbackContext, Filters, MessageHandler, Updater, CommandHandler, ConversationHandler
-from telegram.utils.request import Request
 
 PHOTO, MAIL, CHECK_MAIL, ARE_YOU_SHURE, ARE_YOU_SHURE2 = range(5)
 SAVE_REQUEST, CANCEL = range(2)
@@ -116,8 +130,11 @@ def statistic_time(update, context):
     count_users = len(set(users))
     context.bot.send_message(
         chat_id=chat.id,
-        text=f'За {dict_time[text]} было {count_message} сообщений от {count_users} пользователей',
+        text=(
+            f'За {dict_time[text]} было {count_message} ' +
+            f'сообщений от {count_users} пользователей',
         )
+    )
 
 
 @check_admin
@@ -223,8 +240,10 @@ def are_you_shure_handler(update, context):
             [['/cancel']],
             resize_keyboard=True
             )
-        update.message.reply_text(
-            'Ты уверен в массовом спаме? Если да, то введи первое слово сообщения',
+        update.message.reply_text((
+            'Ты уверен в массовом спаме? Если да,' +
+            'то введи первое слово сообщения'
+            ),
             reply_markup=buttons
         )
         return ARE_YOU_SHURE2
@@ -274,8 +293,11 @@ def are_you_shure2_handler(update, context):
                 banned_count += 1
         context.bot.send_message(
             chat_id=chat.id,
-            text=f'Успешно отправлено {successfully_count} сообщений, ошибок {banned_count}',
+            text=(
+                f'Успешно отправлено {successfully_count} ' +
+                f'сообщений, ошибок {banned_count}'
             )
+        )
         return ConversationHandler.END
     else:
         update.message.reply_text(
@@ -636,6 +658,8 @@ def dates_leader(update, context):
         parse_mode="MARKDOWN"
         )
 
+
+@save_user_and_messages
 def basic_conditions_leader(update, context):
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
@@ -661,13 +685,19 @@ def basic_conditions_leader(update, context):
 
 
 @save_user_and_messages
-def do_echo(update: Update, context: CallbackContext):
-    chat_id = update.message.chat_id
-    text = update.message.text_markdown
-
-    reply_text = "Ваш ID = {}\n\n{}".format(chat_id, text)
+def do_i_dont_know(update, context):
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться в начало'],
+         ['Позвать оператора']],
+        resize_keyboard=True
+        )
+    reply_text = (
+        'Я советую пользоваться кнопками навигации. \n' +
+        'Предлагаю вернуться к началу или обратиться к оператору.'
+    )
     update.message.reply_text(
         text=reply_text,
+        reply_markup=buttons,
         parse_mode="MARKDOWN"
     )
 
@@ -676,7 +706,7 @@ def do_echo(update: Update, context: CallbackContext):
 def call_operator(update, context):
     chat = update.effective_chat
     button = ReplyKeyboardMarkup(
-        [['/start'],
+        [['Вернуться в начало'],
          ['Запросить звонок']],
         resize_keyboard=True
         )
@@ -685,7 +715,6 @@ def call_operator(update, context):
         text='Можете написать нашему оператору. https://t.me/Mining_university_official . Также можете запросить звонок оператора, мы свяжемся с Вами в ближайшее время',
         reply_markup=button
         )
-
 
 
 @save_user_and_messages
@@ -727,7 +756,7 @@ def wake_up(update, context):
     chat = update.effective_chat
     name = update.message.chat.first_name
     buttons = ReplyKeyboardMarkup(
-        [['Хочу узнать про поступление', 'Хочу узнать про общежития'],
+        [['Хочу узнать про поступление', ],
          ['Конкурс "Лидер школы"', 'Не нашел ответа. Позвать оператора']],
         resize_keyboard=True
         )
@@ -870,7 +899,7 @@ class Command(BaseCommand):
         updater.dispatcher.add_handler(conv_handler)
         updater.dispatcher.add_handler(conv_handler_call)
 
-        message_handler = MessageHandler(Filters.text, do_echo)
+        message_handler = MessageHandler(Filters.text, do_i_dont_know)
 
         updater.dispatcher.add_handler(message_handler)
 

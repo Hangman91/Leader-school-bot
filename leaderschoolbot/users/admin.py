@@ -18,6 +18,13 @@ class ProfileAdmin(admin.ModelAdmin):
         'first_last_name',
         'access_level'
     )
+    list_filter = (
+        'first_last_name',
+        'access_level'
+    )
+    search_fields = (
+        'first_last_name',
+    )
 
     def count(self, obj):
         result = Message.objects.filter(user=obj).count()
@@ -31,9 +38,17 @@ class MessageAdmin(admin.ModelAdmin):
     list_display = (
         'id',
         'user',
+        'first_last_name',
         'text',
         'created_at'
     )
+    search_fields = (
+        'user__first_last_name',
+    )
+
+    def first_last_name(self, obj):
+        author = User.objects.get(id=obj.user_id)
+        return author.first_last_name
 
 
 @admin.register(Call)
