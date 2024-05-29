@@ -636,6 +636,29 @@ def dates_leader(update, context):
         parse_mode="MARKDOWN"
         )
 
+def basic_conditions_leader(update, context):
+    chat = update.effective_chat
+    buttons = ReplyKeyboardMarkup(
+        [['Вернуться назад к Лидеру школы']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Участие в конкурсе «Лидер школы» могут принимать: \n' +
+            '- граждане Российской Федерации, закончившие обучение по образовательным программам среднего общего образования (учащиеся 11 классов школ, выпускники школ предыдущих лет); \n' +
+            '- иностранные граждане и лица без гражданства, закончившие обучение по образовательным программам среднего общего образования (в том числе обучающиеся за рубежом) (учащиеся выпускных классов школ). \n\n' +
+
+            'Для участия в конкурсе необходимо: \n' +
+            '- [Подать заявку](https://docs.google.com/forms/d/e/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0aZxj7QqCnbUGg/viewform) \n' +
+            '- Заключить соглашение о намерениях участия в конкурсе. \n' +
+            '- Предоставить в Приёмную комиссию необходимые документы в установленные сроки. \n' +
+            '- Набрать по результатам сдачи ЕГЭ суммарный конкурсный балл не ниже установленных пороговых значений.'
+        ),
+        reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
 
 @save_user_and_messages
 def do_echo(update: Update, context: CallbackContext):
@@ -749,6 +772,8 @@ dict = {
         requirement_leader,
     r'Важные даты конкурса':
         dates_leader,
+    r'Основновные условия':
+        basic_conditions_leader,
     }
 
 dict_admin = {
