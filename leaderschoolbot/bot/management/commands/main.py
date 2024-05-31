@@ -9,7 +9,7 @@ from telegram import (
 )
 
 from telegram.ext import (
-    filters,
+    Filters,
     MessageHandler,
     Updater,
     CommandHandler,
