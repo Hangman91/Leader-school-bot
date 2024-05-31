@@ -493,7 +493,8 @@ def form_leader(update, context):
             'После подачи заявки на участие в конкурсе в течение суток ' +
             'Вам придёт письмо с дальнейшей инструкцией \n' +
             '[Подать заявку](https://docs.google.com/forms/d/e' +
-            '/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0aZxj7QqCnbUGg/viewform)'
+            '/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0' +
+            'aZxj7QqCnbUGg/viewform)'
         ),
         reply_markup=buttons,
         parse_mode="MARKDOWN"
@@ -631,7 +632,7 @@ def requirement_leader(update, context):
     context.bot.send_message(
         chat_id=chat.id,
         text=(
-            'Выберите пункт меню.'
+            'Выберите интересующий Вас пункт меню.'
         ),
         reply_markup=buttons,
         parse_mode="MARKDOWN"
@@ -721,6 +722,88 @@ def call_operator(update, context):
 
 
 @save_user_and_messages
+def start_entrance(update, context):
+    chat = update.effective_chat
+    button = ReplyKeyboardMarkup(
+        [['Порядок приема на обучение', 'План приема и перечень ЕГЭ'],
+         ['Сроки приема на обучение', 'Сведения об образовательный программах'],
+         ['Вернуться в начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text='Выберите интересующий Вас пункт меню.',
+        reply_markup=button
+        )
+
+
+@save_user_and_messages
+def order_entrance(update, context):
+    chat = update.effective_chat
+    button = ReplyKeyboardMarkup(
+        [['Вернуться в начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            '[Здесь](http://priem.spmi.ru/sites/default/files/manager/01.Postupaushim/Pravila_priema.pdf) ' +
+            'Вы можете получить информацию о Порядке приема на обучение по  ' +
+            'программам базового высшего образования в 2024 году.'),
+        reply_markup=button
+        )
+
+
+@save_user_and_messages
+def kcp_entrance(update, context):
+    chat = update.effective_chat
+    button = ReplyKeyboardMarkup(
+        [['Вернуться в начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text='[Здесь](http://priem.spmi.ru/sites/default/files/manager/03.PlanPriema/kcp_bak_spec.pdf) ' +
+        'Вы найдете информацию о количестве бюджетных мест и ' +
+        'предметах ЕГЭ, необходимых для поступления',
+        reply_markup=button
+        )
+
+
+@save_user_and_messages
+def deadlines_entrance(update, context):
+    chat = update.effective_chat
+    button = ReplyKeyboardMarkup(
+        [['Вернуться в начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text='[Здесь](https://priem.spmi.ru/sites/default/files/' +
+        'manager/01.Postupaushim/Informaciya_o_srokah_provedeniya_priema.pdf) ' +
+        'Вы можете найти информацию о сроках приема на обучение по ' +
+        'программам базового высшего образования в 2024 году',
+        reply_markup=button
+        )
+
+
+@save_user_and_messages
+def landing_entrance(update, context):
+    chat = update.effective_chat
+    button = ReplyKeyboardMarkup(
+        [['Вернуться в начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text='[Здесь](https://landing.spmi.ru/bakalavriat) ' +
+        'Здесь Вы найдете характеристику образовательных программ ' +
+        '(сроки обучения, изучаемые дисциплины, карьерные перспективы и др.)',
+        reply_markup=button
+        )
+
+
+@save_user_and_messages
 def call_request(update, context):
     update.message.reply_text(
         'Пришлите одним сообщение номер телефона и как к Вам можно обращаться',
@@ -804,6 +887,16 @@ dict = {
         dates_leader,
     r'Основные условия':
         basic_conditions_leader,
+    r'Хочу узнать про поступление':
+        start_entrance,
+    r'Порядок приема на обучение':
+        order_entrance,
+    r'План приема и перечень ЕГЭ':
+        kcp_entrance,
+    r'Сроки приема на обучение':
+        deadlines_entrance,
+    r'Сведения об образовательный программах':
+        landing_entrance,
     }
 
 dict_admin = {
