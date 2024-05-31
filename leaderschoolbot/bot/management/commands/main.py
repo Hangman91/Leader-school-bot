@@ -18,6 +18,7 @@ from telegram.ext import (
 
 from telegram.utils.request import Request
 
+from django.utils import timezone
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
@@ -114,7 +115,7 @@ def statistic_time(update, context):
         "/week": "неделю",
         "/all_time": "всё время",
     }
-    now = datetime.datetime.now()
+    now = datetime.datetime.now(tz=timezone.utc)
     yesterday = now - datetime.timedelta(days=1)
     week_ago = now - datetime.timedelta(days=7)
     if text == "/day":
@@ -132,8 +133,9 @@ def statistic_time(update, context):
         chat_id=chat.id,
         text=(
             f'За {dict_time[text]} было {count_message} ' +
-            f'сообщений от {count_users} пользователей',
-        )
+            f'сообщений от {count_users} пользователей'
+        ),
+        parse_mode="MARKDOWN"
     )
 
 
@@ -489,7 +491,7 @@ def form_leader(update, context):
         text=(
             'После подачи заявки на участие в конкурсе в течение суток ' +
             'Вам придёт письмо с дальнейшей инструкцией \n' +
-            '[Подать заявку](https://docs.google.com/forms/d/e'+
+            '[Подать заявку](https://docs.google.com/forms/d/e' +
             '/1FAIpQLSdZhKA47Elb-iCrvmtnt3FwU2yxFAVDskqg0aZxj7QqCnbUGg/viewform)'
         ),
         reply_markup=buttons,
@@ -620,7 +622,7 @@ def video_leader(update, context):
 def requirement_leader(update, context):
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
-        [['Основновные условия', 'Важные даты конкурса'],
+        [['Основные условия', 'Важные даты конкурса'],
          ['Пороговые баллы', 'Подать заявку'],
          ['Вернуться назад к Лидеру школы']],
         resize_keyboard=True
@@ -773,8 +775,6 @@ def wake_up(update, context):
 dict = {
     r'оператор':
         call_operator,
-    # r'запросить звонок':
-    #     call_request,
     r'здравствуйте|сначала|привет|начало':
         wake_up,
     r'Лидер* школы|Вернуться назад к Лидеру школы':
@@ -801,7 +801,7 @@ dict = {
         requirement_leader,
     r'Важные даты конкурса':
         dates_leader,
-    r'Основновные условия':
+    r'Основные условия':
         basic_conditions_leader,
     }
 

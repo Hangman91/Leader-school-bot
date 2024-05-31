@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class User(models.Model):
@@ -47,7 +48,7 @@ class Message(models.Model):
 
     created_at = models.DateTimeField(
         verbose_name='Время получения',
-        auto_now_add=True,
+        default=timezone.now
     )
 
     class Meta:
