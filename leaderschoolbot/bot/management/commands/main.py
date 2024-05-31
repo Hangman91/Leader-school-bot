@@ -750,7 +750,8 @@ def order_entrance(update, context):
             '[Здесь](http://priem.spmi.ru/sites/default/files/manager/01.Postupaushim/Pravila_priema.pdf) ' +
             'Вы можете получить информацию о Порядке приема на обучение по  ' +
             'программам базового высшего образования в 2024 году.'),
-        reply_markup=button
+        reply_markup=button,
+        parse_mode="MARKDOWN"
         )
 
 
@@ -766,7 +767,8 @@ def kcp_entrance(update, context):
         text='[Здесь](http://priem.spmi.ru/sites/default/files/manager/03.PlanPriema/kcp_bak_spec.pdf) ' +
         'Вы найдете информацию о количестве бюджетных мест и ' +
         'предметах ЕГЭ, необходимых для поступления',
-        reply_markup=button
+        reply_markup=button,
+        parse_mode="MARKDOWN"
         )
 
 
@@ -783,7 +785,8 @@ def deadlines_entrance(update, context):
         'manager/01.Postupaushim/Informaciya_o_srokah_provedeniya_priema.pdf) ' +
         'Вы можете найти информацию о сроках приема на обучение по ' +
         'программам базового высшего образования в 2024 году',
-        reply_markup=button
+        reply_markup=button,
+        parse_mode="MARKDOWN"
         )
 
 
@@ -799,7 +802,8 @@ def landing_entrance(update, context):
         text='[Здесь](https://landing.spmi.ru/bakalavriat) ' +
         'Здесь Вы найдете характеристику образовательных программ ' +
         '(сроки обучения, изучаемые дисциплины, карьерные перспективы и др.)',
-        reply_markup=button
+        reply_markup=button,
+        parse_mode="MARKDOWN"
         )
 
 
