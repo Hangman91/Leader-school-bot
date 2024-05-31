@@ -115,7 +115,7 @@ def statistic_time(update, context):
         "/week": "неделю",
         "/all_time": "всё время",
     }
-    now = datetime.datetime.now()
+    now = timezone.now()
     print(now)
     yesterday = now - datetime.timedelta(days=1)
     week_ago = now - datetime.timedelta(days=7)
