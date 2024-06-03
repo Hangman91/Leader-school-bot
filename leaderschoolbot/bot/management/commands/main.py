@@ -841,7 +841,7 @@ def landing_entrance(update, context):
     context.bot.send_message(
         chat_id=chat.id,
         text='[Здесь](https://landing.spmi.ru/) ' +
-        'Здесь Вы найдете характеристику образовательных программ ' +
+        'Вы найдете характеристику образовательных программ ' +
         '(сроки обучения, изучаемые дисциплины, карьерные перспективы и др.)',
         reply_markup=button,
         parse_mode="MARKDOWN"
