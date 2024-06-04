@@ -2,6 +2,7 @@ version: '3.8'
 services:
 
   db:
+    restart: always
     image: postgres:13.0-alpine
     volumes:
       - /var/lib/postgresql/data/
@@ -28,3 +29,16 @@ services:
       - bot
     env_file:
       - ./.env
+  nginx:
+    image: nginx:1.21.3-alpine
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+
+    depends_on:
+      - web
+
