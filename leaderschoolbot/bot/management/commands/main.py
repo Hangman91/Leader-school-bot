@@ -351,7 +351,7 @@ def about_leader(update, context):
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
         [['Цели и задачи конкурса', 'Бонусы "Гранта"'],
-         ['Количество мест по гранту', 'Подать заявку'],
+         ['Количество мест по гранту', 'Необходимые ЕГЭ'],
          ['Вернуться назад к Лидеру школы']],
         resize_keyboard=True
         )
@@ -484,17 +484,32 @@ def bonuses_leader(update, context):
             '- компенсация проезда к месту проживания для иногородних ' +
             'обучающихся один раз в первом семестре после первой ' +
             'сессии *(до 20 000 рублей)*; \n' +
-            '- академическая стипендия в установленном порядке; \n' +
-            '- повышенная стипендия (после первого семестра) при сдаче ' +
-            'первой сессии на «отлично» – *10 000 рублей*; \n' +
-            '- повышенная стипендия (после первого семестра) при сдаче ' +
-            'первой сессии на «хорошо» и «отлично» – *5 000 рублей*; \n' +
+            '- повышенная академическая стипендия предоставляемая в ' +
+            'установленном порядке:' +
+            'при сдаче первой сессии на «отлично» – до 10 000 рублей*; \n' +
+            '- при сдаче ' +
+            'первой сессии на «хорошо» и «отлично» – до 5 000 рублей*; \n' +
             '- для победителей и призеров предметных олимпиад на ' +
             'период 5 месяцев – *10 000 рублей*; \n' +
-            '- ежедневное бесплатное разовое питание по ' +
-            'рабочим дням «Перекус горняка».'
+            '- «Перекус горняка».'
         ),
         reply_markup=buttons,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def need_ege_leader(update, context):
+    chat = update.effective_chat
+    context.bot.send_photo(
+        chat_id=chat.id,
+        photo=(
+            'https://priem.spmi.ru/sites/default/files/' +
+            'manager/10ac7080-967e-48c3-985e-ad8af81ffa2a.jpg'
+        ),
+        caption=(
+            'С перечнем ЕГЭ можете ознакомиться здесь.'
+        ),
         parse_mode="MARKDOWN"
         )
 
@@ -556,6 +571,7 @@ def answer_score_leader(update, context):
     text220_239 = (
         'Теплоэнергетика и теплотехника – 220\n' +
         'Металлургия - 220\n' +
+        'Технология художественной обработки материалов – 220\n' +
         'Технология транспортных процессов – 225\n' +
         'Технология геологической разведки – 225\n' +
         'Прикладная геология – 225\n' +
@@ -581,7 +597,6 @@ def answer_score_leader(update, context):
         'Менеджмент – 265\n' +
         'Химическая технология – 270\n' +
         'Экономика – 275\n' +
-        'Технология художественной обработки материалов – 290\n' +
         'Архитектура – 320 \n'
     )
     if update.message.text == 'От 210 до 219':
@@ -675,6 +690,8 @@ def dates_leader(update, context):
             'с 15 декабря 2023 по 4 июля 2024 года  \n\n' +
             '*Подача заявления:*\n' +
             'с 20 июня 2024 года по 4 июля 2024 года \n\n' +
+            '*Подведение итогов конкурса:*\n' +
+            '5 июля 2024 года \n\n' +            
             '*Подача оригинала:*\n' +
             'не позднее 10 июля 2024 года \n\n' +
             '*Выдача «Гранта»:*\n' +
@@ -764,7 +781,7 @@ def start_entrance(update, context):
         [['Порядок приема на обучение',
           'План приема и перечень ЕГЭ'],
          ['Сроки приема на обучение',
-          'Сведения об образовательный программах'],
+          'Сведения об образовательных программах'],
          ['Вернуться в начало']],
         resize_keyboard=True
         )
@@ -849,6 +866,55 @@ def landing_entrance(update, context):
 
 
 @save_user_and_messages
+def dormitory_main(update, context):
+    chat = update.effective_chat
+    button = ReplyKeyboardMarkup(
+        [['Cтоимость проживания', 'Количество мест для заселения'],
+         ['Вернуться в начало']],
+        resize_keyboard=True
+        )
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Санкт-Петербургский горный университет имеет ' +
+            '9 своих комфортабельных общежитий, расположенных ' +
+            'на Васильевском острове вблизи учебных центов.'
+        ),
+        reply_markup=button,
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def coast_dormitory(update, context):
+    chat = update.effective_chat
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Ознакомиться со стоимостью проживания и категориями ' +
+            'комфортности Вы можете по ссылке - ' +
+            'https://spmi.ru/stoimost-prozivania-s-ucetom-komfortnosti'
+        ),
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
+def rooms_dormitory(update, context):
+    chat = update.effective_chat
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Количество мест для заселения студентов ' +
+            'первого курса в 2024 году Вы можете узнать здесь ' +
+            '- https://priem.spmi.ru/sites/default/files/' +
+            'manager/obzhezhitia/2024/svodnaya.pdf'
+        ),
+        parse_mode="MARKDOWN"
+        )
+
+
+@save_user_and_messages
 def call_request(update, context):
     update.message.reply_text(
         'Пришлите одним сообщение номер телефона и как к Вам можно обращаться',
@@ -889,8 +955,8 @@ def wake_up(update, context):
     chat = update.effective_chat
     name = update.message.chat.first_name
     buttons = ReplyKeyboardMarkup(
-        [['Хочу узнать про поступление', ],
-         ['Конкурс "Лидер школы"', 'Не нашел ответа. Позвать оператора']],
+        [['Хочу узнать про поступление', 'Конкурс "Лидер школы"'],
+         ['Общежития', 'Не нашел ответа. Позвать оператора']],
         resize_keyboard=True
         )
     context.bot.send_message(
@@ -918,6 +984,8 @@ dict = {
         places_leader,
     r'Бонусы "Гранта"':
         bonuses_leader,
+    r'Необходимые ЕГЭ':
+        need_ege_leader,
     r'Подать заявку':
         form_leader,
     r'Пороговые баллы':
@@ -942,8 +1010,14 @@ dict = {
         kcp_entrance,
     r'Сроки приема на обучение':
         deadlines_entrance,
-    r'Сведения об образовательный программах':
+    r'Сведения об образовательных программах':
         landing_entrance,
+    r'Общежития':
+        dormitory_main,
+    r'Cтоимость проживания':
+        coast_dormitory,
+    r'Количество мест для заселения':
+        rooms_dormitory,
     }
 
 dict_admin = {
