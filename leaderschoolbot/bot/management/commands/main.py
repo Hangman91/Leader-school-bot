@@ -1,7 +1,6 @@
 import re
 import time
 import datetime
-
 from telegram import (
     Bot,
     ReplyKeyboardMarkup,
@@ -81,7 +80,7 @@ def check_admin(func):
 def admin(update, context):
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
-        [['/statistic', '/massmail'],],
+        [['/statistic', '/massmail'], ],
         resize_keyboard=True
         )
     context.bot.send_message(
@@ -143,7 +142,7 @@ def statistic_time(update, context):
 @check_admin
 def massmail(update, context):
     buttons = ReplyKeyboardMarkup(
-        [['/cancel'],],
+        [['/cancel'], ],
         resize_keyboard=True
         )
     update.message.reply_text(
@@ -220,7 +219,7 @@ def skip_photo(update, context):
 def check_mail_handler(update, context):
     if update.message.text == 'Да, я проверил':
         buttons = ReplyKeyboardMarkup(
-            [['Да', 'Нет'],],
+            [['Да', 'Нет'], ],
             resize_keyboard=True
             )
         update.message.reply_text(
@@ -228,12 +227,11 @@ def check_mail_handler(update, context):
             reply_markup=buttons
         )
         return ARE_YOU_SHURE
-    else:
-        update.message.reply_text(
-            'Давай заново',
-            reply_markup=ReplyKeyboardRemove()
-        )
-        return ConversationHandler.END
+    update.message.reply_text(
+        'Давай заново',
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return ConversationHandler.END
 
 
 @check_admin
