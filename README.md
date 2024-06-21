@@ -41,16 +41,16 @@ Docker-compose
 2. Админка
 3. Непосредственно сам бот
 
-В файле .env должны быть прописаны следующие переменные:
-**TOKEN** - Токен для работы с ботом
-**SECRET_KEY** - Ключ для работы с Джанго
-Параметры для работы с базой данных:
-**DB_ENGINE**
-**DB_NAME**
-**POSTGRES_USER**
-**POSTGRES_PASSWORD**
-**DB_HOST**
-**DB_PORT**
+В файле .env должны быть прописаны следующие переменные:  
+**TOKEN** - Токен для работы с ботом  
+**SECRET_KEY** - Ключ для работы с Джанго  
+Параметры для работы с базой данных:  
+**DB_ENGINE**  
+**DB_NAME**  
+**POSTGRES_USER**  
+**POSTGRES_PASSWORD**  
+**DB_HOST**  
+**DB_PORT**  
 
 Команды для докера: 
 docker build -t astalavista91/leaderbot:latest .
