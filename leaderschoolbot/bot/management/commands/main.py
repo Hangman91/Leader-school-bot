@@ -248,12 +248,11 @@ def are_you_shure_handler(update, context):
             reply_markup=buttons
         )
         return ARE_YOU_SHURE2
-    else:
-        update.message.reply_text(
-            'Ок',
-            reply_markup=ReplyKeyboardRemove()
-        )
-        return ConversationHandler.END
+    update.message.reply_text(
+        'Ок',
+        reply_markup=ReplyKeyboardRemove()
+    )
+    return ConversationHandler.END
 
 
 @check_admin
@@ -300,18 +299,17 @@ def are_you_shure2_handler(update, context):
             )
         )
         return ConversationHandler.END
-    else:
-        update.message.reply_text(
-            'Неверно, попробуй ещё раз',
-            reply_markup=ReplyKeyboardRemove()
-        )
+    update.message.reply_text(
+        'Неверно, попробуй ещё раз',
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 
 @check_admin
 def cancel(update, context):
     chat = update.effective_chat
     buttons = ReplyKeyboardMarkup(
-        [['/statistic', '/massmail'],],
+        [['/statistic', '/massmail'], ],
         resize_keyboard=True
         )
     context.bot.send_message(
@@ -689,7 +687,7 @@ def dates_leader(update, context):
             '*Подача заявления:*\n' +
             'с 20 июня 2024 года по 4 июля 2024 года \n\n' +
             '*Подведение итогов конкурса:*\n' +
-            '5 июля 2024 года \n\n' +            
+            '5 июля 2024 года \n\n' +           
             '*Подача оригинала:*\n' +
             'не позднее 10 июля 2024 года \n\n' +
             '*Выдача «Гранта»:*\n' +
