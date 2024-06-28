@@ -799,7 +799,8 @@ def apply_documents(update, context):
             '[по ссылке](https://priem.spmi.ru/podat-dokumenty-1/) \n' +
             'Там и ссылка на личный кабинет и инструкция ' +
             ' по заполнению заявления.'
-        )
+        ),
+        parse_mode="MARKDOWN"
     )
 
 
