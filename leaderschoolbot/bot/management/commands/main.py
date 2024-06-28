@@ -1062,15 +1062,6 @@ class Command(BaseCommand):
             bot=bot,
             use_context=True)
 
-        for a in dict:
-            updater.dispatcher.add_handler(
-                MessageHandler(
-                    Filters.regex(
-                        re.compile(a, re.IGNORECASE)),
-                    dict[a]
-                )
-            )
-
         for command in dict_admin:
             updater.dispatcher.add_handler(
                 CommandHandler(command, dict_admin[command])
@@ -1106,6 +1097,17 @@ class Command(BaseCommand):
                 CommandHandler('cancel', cancel),
             ]
         )
+
+
+        for a in dict:
+            updater.dispatcher.add_handler(
+                MessageHandler(
+                    Filters.regex(
+                        re.compile(a, re.IGNORECASE)),
+                    dict[a]
+                )
+            )
+
 
         conv_handler_call = ConversationHandler(
             entry_points=[
