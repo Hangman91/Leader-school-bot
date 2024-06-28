@@ -1069,7 +1069,7 @@ class Command(BaseCommand):
 
         conv_handler = ConversationHandler(
             entry_points=[
-                CommandHandler('massmail', massmail, block=False),
+                CommandHandler('massmail', massmail),
             ],
             states={
                 MAIL: [
