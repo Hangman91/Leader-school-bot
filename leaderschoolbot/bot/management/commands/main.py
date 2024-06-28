@@ -774,11 +774,12 @@ def call_operator(update, context):
 def start_entrance(update, context):
     chat = update.effective_chat
     button = ReplyKeyboardMarkup(
-        [['Порядок приема на обучение',
-          'План приема и перечень ЕГЭ'],
-         ['Сроки приема на обучение',
-          'Сведения об образовательных программах'],
-         ['Вернуться в начало']],
+        [['Подать документы',
+          'Порядок приема на обучение'],
+         ['План приема и перечень ЕГЭ3',
+          'Сроки приема на обучение'],
+         ['Сведения об образовательных программах',
+          'Вернуться в начало']],
         resize_keyboard=True
         )
     context.bot.send_message(
@@ -786,6 +787,20 @@ def start_entrance(update, context):
         text='Выберите интересующий Вас пункт меню.',
         reply_markup=button
         )
+
+
+@save_user_and_messages
+def apply_documents(update, context):
+    chat = update.effective_chat
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(
+            'Для подачи документов переходите ' +
+            '[по ссылке](https://priem.spmi.ru/podat-dokumenty-1/) \n' +
+            'Там и ссылка на личный кабинет и инструкция ' +
+            ' по заполнению заявления.'
+        )
+    )
 
 
 @save_user_and_messages
