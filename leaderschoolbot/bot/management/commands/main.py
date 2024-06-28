@@ -1015,6 +1015,8 @@ dict = {
         basic_conditions_leader,
     r'Хочу узнать про поступление':
         start_entrance,
+    r'Подать документы':
+        apply_documents,
     r'Порядок приема на обучение':
         order_entrance,
     r'План приема и перечень ЕГЭ':
