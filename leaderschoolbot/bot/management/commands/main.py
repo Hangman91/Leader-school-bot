@@ -1069,12 +1069,12 @@ class Command(BaseCommand):
 
         conv_handler = ConversationHandler(
             entry_points=[
-                CommandHandler('massmail', massmail),
+                CommandHandler('massmail', massmail, block=False),
             ],
             states={
                 MAIL: [
                     CommandHandler('cancel', cancel),
-                    MessageHandler(Filters.text, mail_handler),
+                    MessageHandler(Filters.text, mail_handler, block=False),
                 ],
                 PHOTO: [
                     CommandHandler('skip', skip_photo),
@@ -1098,7 +1098,6 @@ class Command(BaseCommand):
             ]
         )
 
-
         for a in dict:
             updater.dispatcher.add_handler(
                 MessageHandler(
@@ -1107,7 +1106,6 @@ class Command(BaseCommand):
                     dict[a]
                 )
             )
-
 
         conv_handler_call = ConversationHandler(
             entry_points=[
