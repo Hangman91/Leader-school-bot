@@ -1074,7 +1074,7 @@ class Command(BaseCommand):
             states={
                 MAIL: [
                     CommandHandler('cancel', cancel),
-                    MessageHandler(Filters.text, mail_handler, block=False),
+                    MessageHandler(Filters.text, mail_handler),
                 ],
                 PHOTO: [
                     CommandHandler('skip', skip_photo),
