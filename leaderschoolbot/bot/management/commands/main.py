@@ -1082,6 +1082,10 @@ dict = {
         coast_dormitory,
     r'Количество мест для заселения':
         rooms_dormitory,
+    r'Аспирантура':
+        aspirant,
+    r'Сроки подачи документов АСП':
+        time_asp,
     }
 
 dict_admin = {
