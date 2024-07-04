@@ -627,7 +627,7 @@ def tg_channel_leader(update, context):
         text=(
             'Все актуальные новости Вы сможете получить в ' +
             'Телеграм-канале конкурса: \n' +
-            '[Подписаться здесь](https://t.me/mining_leader'
+            '[Подписаться здесь](https://t.me/mining_leader)'
         ),
         reply_markup=buttons,
         parse_mode="MARKDOWN"
@@ -1038,9 +1038,9 @@ def vi_asp(update, context):
             '- Собеседование;\n' +
             '- Защита Научного задела по теме и объекту ' +
             'научных исследований.\n' +
-            '[Более подробно здесь}(https://priem.spmi.ru/sites/default/' +
+            '[Более подробно здесь](https://priem.spmi.ru/sites/default/' +
             'files/manager/08.aspirantura/2024/5.%20Перечень%20' +
-            'вступительных%20испытаний.pdf'
+            'вступительных%20испытаний.pdf)'
         ),
         parse_mode="MARKDOWN"
     )
@@ -1168,7 +1168,7 @@ def contact_asp(update, context):
         chat_id=chat.id,
         text=(
             'Если у Вас возникнуть вопросы, Вы можете связаться с нами:\n' +
-            '- [телеграм-канал](https://t.me/+bUEGIrtIspI5MmNi);\n' +
+            '- [телеграм-канал](https://t.me/+wfLeOU6I06M3ZDky);\n' +
             '- почта ispo@spmi.ru'
         ),
         parse_mode="MARKDOWN"
