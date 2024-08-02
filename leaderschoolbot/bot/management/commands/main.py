@@ -261,6 +261,10 @@ def are_you_shure2_handler(update, context):
 
     first_word = text_mail.split()[0]
     chat = update.effective_chat
+    context.bot.send_message(
+            chat_id=chat.id,
+            text=first_word
+        )
     if update.message.text == first_word:
         update.message.reply_text(
             'Отправка пошла',
