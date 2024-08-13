@@ -59,3 +59,5 @@ Upd: Докер вернулся в нашу страну, запуск идёт
 docker build -t astalavista91/leaderbot:latest .
 
 docker push astalavista91/leaderbot:latest
+
+Также настроен ГитХаб Action, который пушит контейнер на докерхаб. 
